@@ -10,6 +10,7 @@ import SearchBox from '@/components/SearchBox/SearchBox';
 import Modal from '@/components/Modal/Modal';
 import NoteForm from '@/components/NoteForm/NoteForm';
 import css from './Notes.client.module.css';
+import Link from 'next/link';
 
 interface NotesByTagNameClientProps {
   tagName: string | undefined;
@@ -20,10 +21,10 @@ export const NotesByTagNameClient = ({
 }: NotesByTagNameClientProps) => {
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const openModal = useCallback(() => setIsModalOpen(true), []);
-  const closeModal = useCallback(() => setIsModalOpen(false), []);
+  // const openModal = useCallback(() => setIsModalOpen(true), []);
+  // const closeModal = useCallback(() => setIsModalOpen(false), []);
 
   const [debouncedSearch] = useDebounce(search, 400);
 
@@ -53,10 +54,14 @@ export const NotesByTagNameClient = ({
             onPageChange={setCurrentPage}
           />
         )}
-
-        <button className={css.button} onClick={openModal}>
+        {
+          <Link href="/notes/action/create" className={css.button}>
+            Create note +{' '}
+          </Link>
+        }
+        {/* <button className={css.button} onClick={openModal}>
           Create note +
-        </button>
+        </button> */}
       </header>
       {isLoading && <p>Loading...</p>}
       {isError && <p>Something went wrong. Try again.</p>}
@@ -64,7 +69,7 @@ export const NotesByTagNameClient = ({
         <NoteList notes={data.notes} />
       )}
 
-      {isModalOpen && (
+      {/* {isModalOpen && (
         <Modal onClose={closeModal}>
           <NoteForm
             onCreated={() => {
@@ -73,7 +78,7 @@ export const NotesByTagNameClient = ({
             onCancel={closeModal}
           />
         </Modal>
-      )}
+      )} */}
       {isFetching && <p>Updating...</p>}
     </div>
   );
