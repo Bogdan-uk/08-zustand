@@ -17,11 +17,16 @@ export default function NoteForm() {
 
   const { draft, setDraft, clearDraft } = useNoteDraft();
 
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: createNote,
     onSuccess: () => {
       clearDraft();
-      queryClient.invalidateQueries({ queryKey: ['notes'] });
+
+      queryClient.invalidateQueries({
+        queryKey: ['notes'],
+        exact: false,
+      });
+
       router.push('/notes/filter/all');
       router.refresh();
     },
@@ -42,11 +47,11 @@ export default function NoteForm() {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<
+    event: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
-    setDraft({ [e.target.name]: e.target.value });
+    setDraft({ [event.target.name]: event.target.value });
   };
 
   return (
@@ -56,6 +61,7 @@ export default function NoteForm() {
         className={css.input}
         defaultValue={draft.title}
         onChange={handleChange}
+        required
       />
 
       <textarea
@@ -83,8 +89,8 @@ export default function NoteForm() {
           Cancel
         </Link>
 
-        <button type="submit" className={css.submitButton}>
-          Create note
+        <button type="submit" className={css.submitButton} disabled={isPending}>
+          {isPending ? 'Creating...' : 'Create note'}
         </button>
       </div>
     </form>
