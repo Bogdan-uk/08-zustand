@@ -28,7 +28,6 @@ export default function NoteForm() {
       });
 
       router.push('/notes/filter/all');
-      router.refresh();
     },
   });
 
