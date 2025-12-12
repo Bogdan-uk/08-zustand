@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { createNote, type CreateNotePayload } from '@/lib/api';
 import { type NoteTag } from '@/types/note';
 import css from './NoteForm.module.css';
@@ -13,7 +12,6 @@ const TAGS: NoteTag[] = ['Todo', 'Work', 'Personal', 'Meeting', 'Shopping'];
 
 export default function NoteForm() {
   const router = useRouter();
-  const queryClient = useQueryClient();
 
   const { draft, setDraft, clearDraft } = useNoteDraft();
 
