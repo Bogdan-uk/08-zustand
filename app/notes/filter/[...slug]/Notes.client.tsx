@@ -30,7 +30,7 @@ export const NotesByTagNameClient = ({
   const { data, isError, isLoading, isFetching } = useQuery({
     queryKey: ['notes', tagName, debouncedSearch, currentPage],
     queryFn: () => fetchNotes(currentPage, debouncedSearch, tagName),
-    refetchOnMount: true,
+    refetchOnMount: false,
     placeholderData: keepPreviousData,
   });
 

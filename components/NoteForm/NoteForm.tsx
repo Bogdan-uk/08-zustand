@@ -22,11 +22,6 @@ export default function NoteForm() {
     onSuccess: () => {
       clearDraft();
 
-      queryClient.invalidateQueries({
-        queryKey: ['notes'],
-        exact: false,
-      });
-
       router.push('/notes/filter/all');
     },
   });
