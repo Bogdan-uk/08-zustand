@@ -12,5 +12,5 @@ export interface Note {
 export interface NewNote {
   title: string;
   content: string;
-  tag: string;
+  tag?: string;
 }

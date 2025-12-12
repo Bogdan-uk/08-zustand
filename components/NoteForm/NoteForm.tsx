@@ -2,83 +2,88 @@
 
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createNote, fetchNotes, type CreateNotePayload } from '@/lib/api';
+import { createNote, type CreateNotePayload } from '@/lib/api';
 import { type NoteTag } from '@/types/note';
 import css from './NoteForm.module.css';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useNoteDraft } from '@/lib/store/noteStore';
 
 const TAGS: NoteTag[] = ['Todo', 'Work', 'Personal', 'Meeting', 'Shopping'];
 
 export default function NoteForm() {
-  const queryClient = useQueryClient();
-  const [isPending, setIsPending] = useState(false);
   const router = useRouter();
-  const mutation = useMutation({
-    mutationFn: (payload: CreateNotePayload) => createNote(payload),
+  const queryClient = useQueryClient();
+
+  const { draft, setDraft, clearDraft } = useNoteDraft();
+
+  const { mutate } = useMutation({
+    mutationFn: createNote,
     onSuccess: () => {
-      // queryClient.invalidateQueries({ queryKey: ['notes'] });
-      // window.location.href = '/notes/filter/all';
+      clearDraft();
+      queryClient.invalidateQueries({ queryKey: ['notes'] });
       router.push('/notes/filter/all');
       router.refresh();
     },
   });
 
-  async function handleAction(formData: FormData) {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+
     const payload: CreateNotePayload = {
       title: formData.get('title') as string,
       content: (formData.get('content') as string) || '',
       tag: formData.get('tag') as NoteTag,
     };
 
-    setIsPending(true);
-    await mutation.mutateAsync(payload);
-    setIsPending(false);
-  }
+    mutate(payload);
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    setDraft({ [e.target.name]: e.target.value });
+  };
 
   return (
-    <form action={handleAction} className={css.form}>
-      <div className={css.formGroup}>
-        <label htmlFor="title">Title</label>
-        <input
-          id="title"
-          name="title"
-          type="text"
-          required
-          minLength={3}
-          maxLength={50}
-          className={css.input}
-        />
-      </div>
+    <form onSubmit={handleSubmit} className={css.form}>
+      <input
+        name="title"
+        className={css.input}
+        defaultValue={draft.title}
+        onChange={handleChange}
+      />
 
-      <div className={css.formGroup}>
-        <label htmlFor="content">Content</label>
-        <textarea
-          id="content"
-          name="content"
-          rows={8}
-          maxLength={500}
-          className={css.textarea}
-        />
-      </div>
+      <textarea
+        name="content"
+        className={css.textarea}
+        defaultValue={draft.content}
+        onChange={handleChange}
+      />
 
-      <div className={css.formGroup}>
-        <label htmlFor="tag">Tag</label>
-        <select id="tag" name="tag" className={css.select} required>
-          {TAGS.map(tag => (
-            <option key={tag} value={tag}>
-              {tag}
-            </option>
-          ))}
-        </select>
-      </div>
+      <select
+        name="tag"
+        className={css.select}
+        defaultValue={draft.tag}
+        onChange={handleChange}
+      >
+        {TAGS.map(tag => (
+          <option key={tag} value={tag}>
+            {tag}
+          </option>
+        ))}
+      </select>
 
       <div className={css.actions}>
         <Link href="/notes/filter/all" className={css.cancelButton}>
           Cancel
         </Link>
 
-        <button type="submit" className={css.submitButton} disabled={isPending}>
+        <button type="submit" className={css.submitButton}>
           Create note
         </button>
       </div>
