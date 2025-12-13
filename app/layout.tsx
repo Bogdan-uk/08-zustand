@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     title: 'NoteHub',
     description:
       'NoteHub — сучасний застосунок для створення, збереження та організації ваших нотаток.',
-    url: '      ',
+    url: 'https://notehub.goit.global/',
     images: [
       {
         url: 'https://ac.goit.global/fullstack/react/notehub-og-meta.jpg',

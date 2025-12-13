@@ -4,7 +4,7 @@ import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { createNote, type CreateNotePayload } from '@/lib/api';
 import { type NoteTag } from '@/types/note';
 import css from './NoteForm.module.css';
-import Link from 'next/link';
+
 import { useRouter } from 'next/navigation';
 import { useNoteDraft } from '@/lib/store/noteStore';
 
@@ -17,8 +17,8 @@ export default function NoteForm() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: createNote,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notes'] });
+    onSuccess: async () => {
+      await queryClient.refetchQueries({ queryKey: ['notes'] });
       clearDraft();
 
       router.push('/notes/filter/all');
@@ -46,7 +46,9 @@ export default function NoteForm() {
   ) => {
     setDraft({ [event.target.name]: event.target.value });
   };
-
+  const handleCancel = () => {
+    router.back();
+  };
   return (
     <form onSubmit={handleSubmit} className={css.form}>
       <input
@@ -78,9 +80,13 @@ export default function NoteForm() {
       </select>
 
       <div className={css.actions}>
-        <Link href="/notes/filter/all" className={css.cancelButton}>
+        <button
+          type="button"
+          className={css.cancelButton}
+          onClick={handleCancel}
+        >
           Cancel
-        </Link>
+        </button>
 
         <button type="submit" className={css.submitButton} disabled={isPending}>
           {isPending ? 'Creating...' : 'Create note'}
