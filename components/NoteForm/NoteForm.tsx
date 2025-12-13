@@ -17,8 +17,8 @@ export default function NoteForm() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: createNote,
-    onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ['notes'] });
+    onSuccess: () => {
+      queryClient.refetchQueries({ queryKey: ['notes'] });
       clearDraft();
 
       router.push('/notes/filter/all');
