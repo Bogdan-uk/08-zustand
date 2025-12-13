@@ -12,12 +12,13 @@ const TAGS: NoteTag[] = ['Todo', 'Work', 'Personal', 'Meeting', 'Shopping'];
 
 export default function NoteForm() {
   const router = useRouter();
-
+  const queryClient = useQueryClient();
   const { draft, setDraft, clearDraft } = useNoteDraft();
 
   const { mutate, isPending } = useMutation({
     mutationFn: createNote,
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notes'] });
       clearDraft();
 
       router.push('/notes/filter/all');
